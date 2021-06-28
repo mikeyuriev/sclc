@@ -79,6 +79,17 @@ parserSpec = do
             parseExpr "I`N`V`A`L`I`D" `shouldSatisfy` isLeft
 
     describe "line" $ do
+        it "should skip spaces" $ do
+            parseLine " 2  +   -  (  3   *   4 )    " `shouldBe` Right
+                ( BinaryOp Add
+                    ( Value $ Constant 2.0 )
+                    ( UnaryOp Negate
+                        ( BinaryOp Mul
+                            ( Value $ Constant 3.0 )
+                            ( Value $ Constant 4.0 )
+                        )
+                    )
+                )
         it "should parse balanced parens" $ do
             parseLine "(((((3)))))" `shouldBe` Right
                 ( Value $ Constant 3.0 )

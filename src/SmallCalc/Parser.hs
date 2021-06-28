@@ -13,7 +13,7 @@ line :: Parser Node
 line = expr <* eof
 
 expr :: Parser Node
-expr = term `chainl1` addOp
+expr = skipMany space *> term `chainl1` addOp
 
 term :: Parser Node
 term = unary `chainl1` mulOp
@@ -25,10 +25,10 @@ factor :: Parser Node
 factor = parens <|> number
 
 parens :: Parser Node
-parens = between (char '(') (char ')') expr
+parens = between (char '(') (char ')') expr <* skipMany space
 
 number :: Parser Node
-number = Value . Constant <$> num
+number = Value . Constant <$> num <* skipMany space
     where
         num :: Parser Float
         num = fmap read $ (++) <$> integer <*> decimal
@@ -38,14 +38,11 @@ number = Value . Constant <$> num
         decimal = option "" $ (:) <$> char '.' <*> many1 digit
 
 addOp :: Parser (Node -> Node -> Node)
-addOp =
-    char '+' $> BinaryOp Add
+addOp = char '+' <* skipMany space $> BinaryOp Add
 
 mulOp :: Parser (Node -> Node -> Node)
-mulOp =
-    char '*' $> BinaryOp Mul
+mulOp = char '*' <* skipMany space $> BinaryOp Mul
 
 unaryOp :: Parser (Node -> Node)
-unaryOp =
-    char '-' $> UnaryOp Negate
+unaryOp = char '-' <* skipMany space $> UnaryOp Negate
 
