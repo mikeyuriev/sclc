@@ -3,7 +3,6 @@ module Main where
 import Control.Monad.State (unless)
 import System.IO (hFlush, stdout)
 import Text.Parsec
-import Text.Parsec.Error
 import SmallCalc.Eval
 import SmallCalc.Parser
 
