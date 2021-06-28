@@ -1,0 +1,50 @@
+name:                sclc
+version:             0.1.0.0
+github:              "mikeyuriev/sclc"
+license:             BSD3
+author:              "Mike Yuriev"
+maintainer:          "mikeyuriev@gmail.com"
+copyright:           "2021 Mike Yuriev"
+
+extra-source-files:
+- README.md
+
+# Metadata used when publishing your package
+synopsis:            Simple console AST-based calculator writen on Haskell
+category:            Practice
+
+# To avoid duplicated efforts in documentation and dealing with the
+# complications of embedding Haddock markup inside cabal files, it is
+# common to point users to the README.md file.
+description:         Please see the README on GitHub at <https://github.com/mikeyuriev/sclc#readme>
+
+dependencies:
+- base >= 4.7 && < 5
+- mtl >= 2.2 && < 3
+- hspec >= 2.7 && < 3
+- parsec >= 3.1 && < 4
+
+library:
+  source-dirs: src
+
+executables:
+  sclc-exe:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - sclc
+
+tests:
+  sclc-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - sclc
