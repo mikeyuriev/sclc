@@ -77,9 +77,24 @@ parserSpec = do
                 )
         it "should return error on invalid input" $ do
             parseExpr "I`N`V`A`L`I`D" `shouldSatisfy` isLeft
+        it "should handle multiple negations" $ do
+            parseExpr "2*--(3+4)" `shouldBe` Right
+                ( BinaryOp Mul
+                    ( Value $ Constant 2.0 )
+                    ( UnaryOp Negate
+                        ( UnaryOp Negate
+                            ( BinaryOp Add
+                                ( Value $ Constant 3.0 )
+                                ( Value $ Constant 4.0 )
+                            )
+                        )
+                    )
+                )
 
     describe "line" $ do
         it "should skip spaces" $ do
+            parseLine "   2   " `shouldBe` Right
+                ( Value $ Constant 2.0 )
             parseLine " 2  +   -  (  3   *   4 )    " `shouldBe` Right
                 ( BinaryOp Add
                     ( Value $ Constant 2.0 )

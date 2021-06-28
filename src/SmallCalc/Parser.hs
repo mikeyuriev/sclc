@@ -19,7 +19,7 @@ term :: Parser Node
 term = unary `chainl1` mulOp
 
 unary :: Parser Node
-unary = (unaryOp <*> factor) <|> factor
+unary = (unaryOp <*> expr) <|> factor
 
 factor :: Parser Node
 factor = parens <|> number
