@@ -13,7 +13,7 @@ data UnaryOp
     deriving (Eq, Show)
 
 newtype Value
-    = Constant Float
+    = Constant Double
     deriving (Eq, Show)
 
 data Node

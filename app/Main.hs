@@ -5,6 +5,7 @@ import Data.Either (isLeft)
 import Data.List (intercalate)
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
+import Text.Printf (printf)
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Pos as PP
 import SmallCalc.Eval
@@ -30,13 +31,13 @@ loop = do
         putResult $ evalLine "User input" input
         loop
 
-putResult :: Either P.ParseError Float -> IO ()
-putResult (Right value) = print value
+putResult :: Either P.ParseError Double -> IO ()
+putResult (Right value) = putStrLn $ printf "%f" value
 putResult (Left err)    = do
     putStrLn $ "E" ++ showGraphicErrorPos (errorPos err)
     putList "Expected one of:" $ filter (/= "space") $ expectedTokens err
 
-evalLine :: P.SourceName -> String -> Either P.ParseError Float
+evalLine :: P.SourceName -> String -> Either P.ParseError Double
 evalLine source s = eval <$> P.parse line source s
 
 errorPos :: P.ParseError -> Int
