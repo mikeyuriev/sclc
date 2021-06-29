@@ -63,5 +63,3 @@ mulOp =
 unaryOp :: Parser (Node -> Node)
 unaryOp =
     (char '-' <?> "unary minus operator '-'") $> UnaryOp Negate
-    <* skipSpaces
-
