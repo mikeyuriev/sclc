@@ -13,7 +13,7 @@ line :: Parser Node
 line = expr <* eof
 
 expr :: Parser Node
-expr = skipMany space *> term `chainl1` addOp
+expr = skipSpaces *> term `chainl1` addOp
 
 term :: Parser Node
 term = unary `chainl1` mulOp
@@ -24,25 +24,44 @@ unary = (unaryOp <*> expr) <|> factor
 factor :: Parser Node
 factor = parens <|> number
 
+
+skipSpaces :: Parser ()
+skipSpaces = skipMany space <?> "spaces"
+
 parens :: Parser Node
-parens = between (char '(') (char ')') expr <* skipMany space
+parens =
+    between oParen cParen expr
+    <* skipSpaces
+    where
+        oParen = char '(' <?> "open parenthesis '('"
+        cParen = char ')' <?> "closing parenthesis ')'"
 
 number :: Parser Node
-number = Value . Constant <$> num <* skipMany space
+number = Value . Constant <$> fmap read num <* skipSpaces
     where
-        num :: Parser Float
-        num = fmap read $ (++) <$> integer <*> decimal
+        num :: Parser String
+        num = (++) <$> integer <*> decimal
         integer :: Parser String
-        integer = many1 digit
+        integer = digits
         decimal :: Parser String
-        decimal = option "" $ (:) <$> char '.' <*> many1 digit
+        decimal = option "" $ (:) <$> dot <*> digits
+        digits :: Parser String
+        digits = many1 (digit <?> "digit")
+        dot :: Parser Char
+        dot = char '.' <?> "decimal dot '.'"
 
 addOp :: Parser (Node -> Node -> Node)
-addOp = char '+' <* skipMany space $> BinaryOp Add
+addOp =
+    (char '+' <?> "addition operator '+'") $> BinaryOp Add
+    <* skipSpaces
 
 mulOp :: Parser (Node -> Node -> Node)
-mulOp = char '*' <* skipMany space $> BinaryOp Mul
+mulOp =
+    (char '*' <?> "multiplication operator '*'") $> BinaryOp Mul
+    <* skipSpaces
 
 unaryOp :: Parser (Node -> Node)
-unaryOp = char '-' <* skipMany space $> UnaryOp Negate
+unaryOp =
+    (char '-' <?> "unary minus operator '-'") $> UnaryOp Negate
+    <* skipSpaces
 
