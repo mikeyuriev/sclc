@@ -2,7 +2,10 @@ module SmallCalc.AST where
 
 data BinaryOp
     = Add
+    | Sub
     | Mul
+    | Div
+    | Mod
     deriving (Eq, Show)
 
 data UnaryOp

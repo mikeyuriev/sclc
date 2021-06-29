@@ -3,11 +3,15 @@ module SmallCalc.Eval
     )
 where
 
+import Data.Fixed
 import SmallCalc.AST
 
 binaryOp :: BinaryOp -> (Float -> Float -> Float)
 binaryOp Add = (+)
+binaryOp Sub = (-)
 binaryOp Mul = (*)
+binaryOp Div = (/)
+binaryOp Mod = mod'
 
 unaryOp :: UnaryOp -> (Float -> Float)
 unaryOp Negate = (* (-1.0))

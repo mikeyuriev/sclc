@@ -1,4 +1,5 @@
 import Data.Either (isLeft)
+import Text.Printf (printf)
 import Test.Hspec
 import qualified Text.Parsec as P
 
@@ -34,30 +35,51 @@ parserSpec = do
                     ( Value $ Constant 2.0 )
                     ( Value $ Constant 3.0 )
                 )
+            parseExpr "2-3" `shouldBe` Right
+                ( BinaryOp Sub
+                    ( Value $ Constant 2.0 )
+                    ( Value $ Constant 3.0 )
+                )
         it "should parse multiplicative expressions" $ do
             parseExpr "2*3" `shouldBe` Right
                 ( BinaryOp Mul
                     ( Value $ Constant 2.0 )
                     ( Value $ Constant 3.0 )
                 )
-        it "should parse mixed expressions" $ do
-
-            parseExpr "2+3*4" `shouldBe` Right
-                ( BinaryOp Add
+            parseExpr "2/3" `shouldBe` Right
+                ( BinaryOp Div
                     ( Value $ Constant 2.0 )
-                    ( BinaryOp Mul
-                        ( Value $ Constant 3.0 )
-                        ( Value $ Constant 4.0 )
+                    ( Value $ Constant 3.0 )
+                )
+        it "should parse mixed expressions" $ do
+            parseExpr "2+3*4-5/6" `shouldBe` Right
+                ( BinaryOp Sub
+                    ( BinaryOp Add
+                        ( Value $ Constant 2.0 )
+                        ( BinaryOp Mul
+                            ( Value $ Constant 3.0 )
+                            ( Value $ Constant 4.0 )
+                        )
+                    )
+                    ( BinaryOp Div
+                        ( Value $ Constant 5.0 )
+                        ( Value $ Constant 6.0 )
                     )
                 )
         it "should parse mixed expressions with parens" $ do
-            parseExpr "(2+3)*4" `shouldBe` Right
-                ( BinaryOp Mul
-                    ( BinaryOp Add
-                        ( Value $ Constant 2.0 )
-                        ( Value $ Constant 3.0 )
+            parseExpr "(2+3)*(4-5)/6" `shouldBe` Right
+                ( BinaryOp Div
+                    ( BinaryOp Mul
+                        ( BinaryOp Add
+                            ( Value $ Constant 2.0 )
+                            ( Value $ Constant 3.0 )
+                        )
+                        ( BinaryOp Sub
+                            ( Value $ Constant 4.0 )
+                            ( Value $ Constant 5.0 )
+                        )
                     )
-                    ( Value $ Constant 4.0 )
+                    ( Value $ Constant 6.0 )
                 )
         it "should parse negative numbers" $ do
             parseExpr "-2" `shouldBe` Right
@@ -73,6 +95,14 @@ parserSpec = do
                             ( Value $ Constant 3.0 )
                             ( Value $ Constant 4.0 )
                         )
+                    )
+                )
+        it "should parse expressions with negate and subtraction" $ do
+            parseExpr "2--3" `shouldBe` Right
+                ( BinaryOp Sub
+                    ( Value $ Constant 2.0 )
+                    ( UnaryOp Negate
+                        ( Value $ Constant 3.0 )
                     )
                 )
         it "should return error on invalid input" $ do
@@ -120,14 +150,18 @@ evalSpec :: Spec
 evalSpec = do
     describe "eval" $ do
         it "should evaluate node" $ do
-            eval
-                ( BinaryOp Mul
-                    ( BinaryOp Add
-                        ( Value $ Constant 2.0 )
-                        ( Value $ Constant 3.0 )
+            printf "%.2f" (
+                eval
+                    ( BinaryOp Mod
+                        ( BinaryOp Mul
+                            ( BinaryOp Add
+                                ( Value $ Constant 2.1 )
+                                ( Value $ Constant 3.2)
+                            )
+                            ( UnaryOp Negate
+                                ( Value $ Constant 4.3 )
+                            )
+                        )
+                        ( Value $ Constant 5.4 )
                     )
-                    ( UnaryOp Negate
-                        ( Value $ Constant 4.0 )
-                    )
-                )
-            `shouldBe` -20.0
+                ) `shouldBe` "4.21"

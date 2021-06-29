@@ -26,7 +26,7 @@ factor = parens <|> number
 
 
 skipSpaces :: Parser ()
-skipSpaces = skipMany space <?> "spaces"
+skipSpaces = skipMany space
 
 parens :: Parser Node
 parens =
@@ -52,12 +52,19 @@ number = Value . Constant <$> fmap read num <* skipSpaces
 
 addOp :: Parser (Node -> Node -> Node)
 addOp =
-    (char '+' <?> "addition operator '+'") $> BinaryOp Add
+    (
+        (char '+' $> BinaryOp Add <?> "addition operator '+'")
+    <|> (char '-' $> BinaryOp Sub <?> "subtraction operator '-'")
+    )
     <* skipSpaces
 
 mulOp :: Parser (Node -> Node -> Node)
 mulOp =
-    (char '*' <?> "multiplication operator '*'") $> BinaryOp Mul
+    (
+        (char '*' $> BinaryOp Mul <?> "multiplication operator '*'")
+    <|> (char '/' $> BinaryOp Div <?> "division operator '/'")
+    <|> (char '%' $> BinaryOp Mod <?> "modulo operator '%'")
+    )
     <* skipSpaces
 
 unaryOp :: Parser (Node -> Node)

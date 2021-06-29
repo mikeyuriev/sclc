@@ -34,7 +34,7 @@ putResult :: Either P.ParseError Float -> IO ()
 putResult (Right value) = print value
 putResult (Left err)    = do
     putStrLn $ "E" ++ showGraphicErrorPos (errorPos err)
-    putList "Expected one of:" $ filter (/= "spaces") $ expectedTokens err
+    putList "Expected one of:" $ filter (/= "space") $ expectedTokens err
 
 evalLine :: P.SourceName -> String -> Either P.ParseError Float
 evalLine source s = eval <$> P.parse line source s
