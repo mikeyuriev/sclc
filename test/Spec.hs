@@ -1,16 +1,16 @@
 import Data.Either (isLeft)
 import Test.Hspec
-import Text.Parsec
+import qualified Text.Parsec as P
 
 import SmallCalc.AST
 import SmallCalc.Parser
 import SmallCalc.Eval
 
-parseExpr :: String -> Either ParseError Node
-parseExpr = parse expr ""
+parseExpr :: String -> Either P.ParseError Node
+parseExpr = P.parse expr ""
 
-parseLine :: String -> Either ParseError Node
-parseLine = parse line ""
+parseLine :: String -> Either P.ParseError Node
+parseLine = P.parse line ""
 
 main :: IO ()
 main = hspec $ do
