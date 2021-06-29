@@ -27,6 +27,7 @@ source-repository head
 library
   exposed-modules:
       SmallCalc.AST
+      SmallCalc.Error
       SmallCalc.Eval
       SmallCalc.Parser
   other-modules:
