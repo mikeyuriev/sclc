@@ -1,7 +1,9 @@
 module Main where
 
-import Control.Monad.State (unless)
+import Control.Monad.State (unless, when)
+import Data.Either (isLeft)
 import Data.List (intercalate)
+import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 import qualified Text.Parsec as P
 import qualified Text.Parsec.Pos as PP
@@ -10,15 +12,23 @@ import SmallCalc.Parser
 import SmallCalc.Error
 
 main :: IO ()
-main = loop (Right 0.0)
+main = do
+    args <- getArgs
+    unless (null args) $ do
+        let exprStr = head args
+        let result = evalLine "Command line" exprStr
+        when (isLeft result) $ do putStrLn $ " " ++ exprStr
+        putResult result
+    loop
 
-loop :: Either P.ParseError Float -> IO ()
-loop value = do
-    putResult value
+loop :: IO ()
+loop = do
     putStr ">"
     hFlush stdout
     input <- getLine
-    unless (null input) $ loop $ evalLine "User input" input
+    unless (null input) $ do
+        putResult $ evalLine "User input" input
+        loop
 
 putResult :: Either P.ParseError Float -> IO ()
 putResult (Right value) = print value
