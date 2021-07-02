@@ -16,14 +16,10 @@ expr :: Parser Node
 expr = skipSpaces *> term `chainl1` addOp
 
 term :: Parser Node
-term = unary `chainl1` mulOp
-
-unary :: Parser Node
-unary = (unaryOp <*> expr) <|> factor
+term = factor `chainl1` mulOp
 
 factor :: Parser Node
-factor = parens <|> number
-
+factor = (unaryOp <*> factor) <|> parens <|> number
 
 skipSpaces :: Parser ()
 skipSpaces = skipMany space
@@ -70,3 +66,4 @@ mulOp =
 unaryOp :: Parser (Node -> Node)
 unaryOp =
     (char '-' <?> "unary minus operator '-'") $> UnaryOp Negate
+    <* skipSpaces

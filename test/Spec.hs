@@ -87,12 +87,14 @@ parserSpec = do
                     ( Value $ Constant 2.0 )
                 )
         it "should parse expressions with negate" $ do
-            parseExpr "2+-(3*4)" `shouldBe` Right
+            parseExpr "2+-(-3*4)" `shouldBe` Right
                 ( BinaryOp Add
                     ( Value $ Constant 2.0 )
                     ( UnaryOp Negate
                         ( BinaryOp Mul
-                            ( Value $ Constant 3.0 )
+                            ( UnaryOp Negate
+                                ( Value $ Constant 3.0 )
+                            )
                             ( Value $ Constant 4.0 )
                         )
                     )
