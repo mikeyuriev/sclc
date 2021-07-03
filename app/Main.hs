@@ -1,6 +1,7 @@
 module Main where
 
 import Control.Monad.State (unless, when)
+import Data.Bool (bool)
 import Data.Either (isLeft)
 import Data.List (intercalate)
 import System.Environment (getArgs)
@@ -15,13 +16,13 @@ import SmallCalc.Error
 main :: IO ()
 main = do
     args <- getArgs
-    if null args
-        then loop
-        else do
-            let exprStr = head args
-            let result = evalLine "Command line" exprStr
-            when (isLeft result) $ do putStrLn $ " " ++ exprStr
-            putResult result
+    bool (handleArg $ head args) loop (null args)
+
+handleArg :: String -> IO ()
+handleArg arg = do
+    let result = evalLine "Command line" arg
+    when (isLeft result) $ do putStrLn $ " " ++ arg
+    putStr $ showResult result
 
 loop :: IO ()
 loop = do
@@ -29,14 +30,14 @@ loop = do
     hFlush stdout
     input <- getLine
     unless (null input) $ do
-        putResult $ evalLine "User input" input
+        putStr $ showResult $ evalLine "User input" input
         loop
 
-putResult :: Either P.ParseError Double -> IO ()
-putResult (Right value) = putStrLn $ printf "%f" value
-putResult (Left err)    = do
-    putStrLn $ "E" ++ showGraphicErrorPos (errorPos err)
-    putList "Expected" $ expectedTokens err
+showResult :: Either P.ParseError Double -> String
+showResult (Right value) = printf "%f\n" value
+showResult (Left err)    =
+    "E" ++ showGraphicErrorPos (errorPos err) ++ "\n"
+    ++ showLst "Expected" (expectedTokens err)
 
 evalLine :: P.SourceName -> String -> Either P.ParseError Double
 evalLine source s = eval <$> P.parse line source s
@@ -49,8 +50,9 @@ showGraphicErrorPos 0 = ""
 showGraphicErrorPos 1 = "^"
 showGraphicErrorPos x = '-' : showGraphicErrorPos (x - 1)
 
-putList :: String -> [String] -> IO ()
-putList _ []         = return ()
-putList header items = do
-        putStr $ header ++ " "
-        putStrLn $ intercalate ", " $ filter (not . null) items
+showLst :: String -> [String] -> String
+showLst _ []         = ""
+showLst header items =
+    header
+    ++ " "
+    ++ intercalate ", " (filter (not . null) items) ++ "\n"
