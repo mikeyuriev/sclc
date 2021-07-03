@@ -15,12 +15,13 @@ import SmallCalc.Error
 main :: IO ()
 main = do
     args <- getArgs
-    unless (null args) $ do
-        let exprStr = head args
-        let result = evalLine "Command line" exprStr
-        when (isLeft result) $ do putStrLn $ " " ++ exprStr
-        putResult result
-    loop
+    if null args
+        then loop
+        else do
+            let exprStr = head args
+            let result = evalLine "Command line" exprStr
+            when (isLeft result) $ do putStrLn $ " " ++ exprStr
+            putResult result
 
 loop :: IO ()
 loop = do
@@ -35,7 +36,7 @@ putResult :: Either P.ParseError Double -> IO ()
 putResult (Right value) = putStrLn $ printf "%f" value
 putResult (Left err)    = do
     putStrLn $ "E" ++ showGraphicErrorPos (errorPos err)
-    putList "Expected one of:" $ filter (/= "space") $ expectedTokens err
+    putList "Expected" $ expectedTokens err
 
 evalLine :: P.SourceName -> String -> Either P.ParseError Double
 evalLine source s = eval <$> P.parse line source s
@@ -51,5 +52,5 @@ showGraphicErrorPos x = '-' : showGraphicErrorPos (x - 1)
 putList :: String -> [String] -> IO ()
 putList _ []         = return ()
 putList header items = do
-        putStrLn header
-        putStrLn $ intercalate "\n" $ map ("  " ++) items
+        putStr $ header ++ " "
+        putStrLn $ intercalate ", " $ filter (not . null) items
