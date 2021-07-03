@@ -19,7 +19,10 @@ term :: Parser Node
 term = factor `chainl1` lexeme mulOp
 
 factor :: Parser Node
-factor = (lexeme unaryOp <*> factor) <|> lexeme parens <|> lexeme number
+factor =
+        (lexeme unaryOp <*> factor)
+    <|> lexeme parens
+    <|> lexeme constant
 
 lexeme :: Parser a -> Parser a
 lexeme p = p <* skipMany (space <?> "")
@@ -31,8 +34,8 @@ parens =
         oParen = char '(' <?> "("
         cParen = char ')' <?> ")"
 
-number :: Parser Node
-number = Value . Constant <$> fmap read num
+constant :: Parser Node
+constant = Constant <$> fmap read num
     where
         num :: Parser String
         num = (++) <$> digits <*> decimal <?> "number"

@@ -25,45 +25,45 @@ parserSpec = do
     describe "expr" $ do
         it "should parse integer numbers" $ do
             parseExpr "123" `shouldBe` Right
-                ( Value $ Constant 123.0 )
+                ( Constant 123.0 )
         it "should parse float numbers" $ do
             parseExpr "123.456" `shouldBe` Right
-                ( Value $ Constant 123.456 )
+                ( Constant 123.456 )
         it "should parse additive expressions" $ do
             parseExpr "2+3" `shouldBe` Right
                 ( BinaryOp Add
-                    ( Value $ Constant 2.0 )
-                    ( Value $ Constant 3.0 )
+                    ( Constant 2.0 )
+                    ( Constant 3.0 )
                 )
             parseExpr "2-3" `shouldBe` Right
                 ( BinaryOp Sub
-                    ( Value $ Constant 2.0 )
-                    ( Value $ Constant 3.0 )
+                    ( Constant 2.0 )
+                    ( Constant 3.0 )
                 )
         it "should parse multiplicative expressions" $ do
             parseExpr "2*3" `shouldBe` Right
                 ( BinaryOp Mul
-                    ( Value $ Constant 2.0 )
-                    ( Value $ Constant 3.0 )
+                    ( Constant 2.0 )
+                    ( Constant 3.0 )
                 )
             parseExpr "2/3" `shouldBe` Right
                 ( BinaryOp Div
-                    ( Value $ Constant 2.0 )
-                    ( Value $ Constant 3.0 )
+                    ( Constant 2.0 )
+                    ( Constant 3.0 )
                 )
         it "should parse mixed expressions" $ do
             parseExpr "2+3*4-5/6" `shouldBe` Right
                 ( BinaryOp Sub
                     ( BinaryOp Add
-                        ( Value $ Constant 2.0 )
+                        ( Constant 2.0 )
                         ( BinaryOp Mul
-                            ( Value $ Constant 3.0 )
-                            ( Value $ Constant 4.0 )
+                            ( Constant 3.0 )
+                            ( Constant 4.0 )
                         )
                     )
                     ( BinaryOp Div
-                        ( Value $ Constant 5.0 )
-                        ( Value $ Constant 6.0 )
+                        ( Constant 5.0 )
+                        ( Constant 6.0 )
                     )
                 )
         it "should parse mixed expressions with parens" $ do
@@ -71,40 +71,40 @@ parserSpec = do
                 ( BinaryOp Div
                     ( BinaryOp Mul
                         ( BinaryOp Add
-                            ( Value $ Constant 2.0 )
-                            ( Value $ Constant 3.0 )
+                            ( Constant 2.0 )
+                            ( Constant 3.0 )
                         )
                         ( BinaryOp Sub
-                            ( Value $ Constant 4.0 )
-                            ( Value $ Constant 5.0 )
+                            ( Constant 4.0 )
+                            ( Constant 5.0 )
                         )
                     )
-                    ( Value $ Constant 6.0 )
+                    ( Constant 6.0 )
                 )
         it "should parse negative numbers" $ do
             parseExpr "-2" `shouldBe` Right
                 ( UnaryOp Negate
-                    ( Value $ Constant 2.0 )
+                    ( Constant 2.0 )
                 )
         it "should parse expressions with negate" $ do
             parseExpr "2+-(-3*4)" `shouldBe` Right
                 ( BinaryOp Add
-                    ( Value $ Constant 2.0 )
+                    ( Constant 2.0 )
                     ( UnaryOp Negate
                         ( BinaryOp Mul
                             ( UnaryOp Negate
-                                ( Value $ Constant 3.0 )
+                                ( Constant 3.0 )
                             )
-                            ( Value $ Constant 4.0 )
+                            ( Constant 4.0 )
                         )
                     )
                 )
         it "should parse expressions with negate and subtraction" $ do
             parseExpr "2--3" `shouldBe` Right
                 ( BinaryOp Sub
-                    ( Value $ Constant 2.0 )
+                    ( Constant 2.0 )
                     ( UnaryOp Negate
-                        ( Value $ Constant 3.0 )
+                        ( Constant 3.0 )
                     )
                 )
         it "should return error on invalid input" $ do
@@ -112,12 +112,12 @@ parserSpec = do
         it "should handle multiple negations" $ do
             parseExpr "2*--(3+4)" `shouldBe` Right
                 ( BinaryOp Mul
-                    ( Value $ Constant 2.0 )
+                    ( Constant 2.0 )
                     ( UnaryOp Negate
                         ( UnaryOp Negate
                             ( BinaryOp Add
-                                ( Value $ Constant 3.0 )
-                                ( Value $ Constant 4.0 )
+                                ( Constant 3.0 )
+                                ( Constant 4.0 )
                             )
                         )
                     )
@@ -126,20 +126,20 @@ parserSpec = do
     describe "line" $ do
         it "should skip spaces" $ do
             parseLine "   2   " `shouldBe` Right
-                ( Value $ Constant 2.0 )
+                ( Constant 2.0 )
             parseLine " 2  +   -  (  3   *   4 )    " `shouldBe` Right
                 ( BinaryOp Add
-                    ( Value $ Constant 2.0 )
+                    ( Constant 2.0 )
                     ( UnaryOp Negate
                         ( BinaryOp Mul
-                            ( Value $ Constant 3.0 )
-                            ( Value $ Constant 4.0 )
+                            ( Constant 3.0 )
+                            ( Constant 4.0 )
                         )
                     )
                 )
         it "should parse balanced parens" $ do
             parseLine "(((((3)))))" `shouldBe` Right
-                ( Value $ Constant 3.0 )
+                ( Constant 3.0 )
         it "should return error on unbalanced parens" $ do
             parseLine "(((((3))))" `shouldSatisfy` isLeft
             parseLine "((((3)))))" `shouldSatisfy` isLeft
@@ -157,13 +157,13 @@ evalSpec = do
                     ( BinaryOp Mod
                         ( BinaryOp Mul
                             ( BinaryOp Add
-                                ( Value $ Constant 2.1 )
-                                ( Value $ Constant 3.2)
+                                ( Constant 2.1 )
+                                ( Constant 3.2)
                             )
                             ( UnaryOp Negate
-                                ( Value $ Constant 4.3 )
+                                ( Constant 4.3 )
                             )
                         )
-                        ( Value $ Constant 5.4 )
+                        ( Constant 5.4 )
                     )
                 ) `shouldBe` "4.21"

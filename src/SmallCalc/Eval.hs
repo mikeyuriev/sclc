@@ -17,7 +17,7 @@ unaryOp :: UnaryOp -> (Double -> Double)
 unaryOp Negate = (* (-1.0))
 
 eval :: Node -> Double
-eval (Value (Constant c)) = c
-eval (UnaryOp op v)       = unaryOp op (eval v)
-eval (BinaryOp op lv rv)  = binaryOp op (eval lv) (eval rv)
+eval (Constant c)        = c
+eval (UnaryOp op v)      = unaryOp op (eval v)
+eval (BinaryOp op lv rv) = binaryOp op (eval lv) (eval rv)
 

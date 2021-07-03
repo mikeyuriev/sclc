@@ -12,12 +12,8 @@ data UnaryOp
     = Negate
     deriving (Eq, Show)
 
-newtype Value
-    = Constant Double
-    deriving (Eq, Show)
-
 data Node
-    = Value Value
+    = Constant Double
     | BinaryOp BinaryOp Node Node
     | UnaryOp UnaryOp Node
     deriving (Eq, Show)
