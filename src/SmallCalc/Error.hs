@@ -1,19 +1,19 @@
 module SmallCalc.Error
-    ( Error (..)
+    ( SmallCalcError (..)
     , fromParseError
     ) where
 
 import Text.Parsec.Error
 import Text.Parsec.Pos
 
-data Error
-    = SyntaxError Int [String]
-    | DivisionByZero
+data SmallCalcError
+    = ESyntax Int [String]
+    | EDivisionByZero
     deriving (Eq, Show)
 
-fromParseError :: ParseError -> Error
+fromParseError :: ParseError -> SmallCalcError
 fromParseError err
-    = SyntaxError (sourceColumn $ errorPos err) (expectedTokens err)
+    = ESyntax (sourceColumn $ errorPos err) (expectedTokens err)
 
 expectedTokens :: ParseError -> [String]
 expectedTokens

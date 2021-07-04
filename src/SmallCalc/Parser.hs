@@ -11,10 +11,10 @@ import Text.Parsec.String
 import SmallCalc.AST
 import SmallCalc.Error
 
-type ParseResult = Either Error Node
+type ParseResult = Either SmallCalcError Node
 
 parseLine :: String -> ParseResult
-parseLine s = left fromParseError $ parse line "" s
+parseLine = left fromParseError . parse line ""
 
 line :: Parser Node
 line = expr <* (eof <?> "end of input")

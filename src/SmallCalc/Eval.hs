@@ -10,11 +10,11 @@ import SmallCalc.AST
 import SmallCalc.Parser
 import SmallCalc.Error
 
-type EvalResult = Either Error Double
+type EvalResult = Either SmallCalcError Double
 
 binaryOp :: BinaryOp -> EvalResult -> EvalResult -> EvalResult
-binaryOp Div _ (Right 0) = Left DivisionByZero
-binaryOp Mod _ (Right 0) = Left DivisionByZero
+binaryOp Div _ (Right 0) = Left EDivisionByZero
+binaryOp Mod _ (Right 0) = Left EDivisionByZero
 binaryOp Add x y = fmap (+) x <*> y
 binaryOp Sub x y = fmap (-) x <*> y
 binaryOp Mul x y = fmap (*) x <*> y

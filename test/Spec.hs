@@ -165,9 +165,9 @@ evalSpec = do
                         ( Constant 2.0 )
                         ( Constant 2.0 )
                     )
-                ) `shouldBe` Left DivisionByZero
+                ) `shouldBe` Left EDivisionByZero
             eval
                 ( BinaryOp Mod
                     ( Constant 0.0 )
                     ( Constant 0.0 )
-                ) `shouldBe` Left DivisionByZero
+                ) `shouldBe` Left EDivisionByZero

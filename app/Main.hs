@@ -38,14 +38,14 @@ parseAndShow showing = showResult showing . evalParseResult . parseLine
 showResult :: ErrorShowing -> EvalResult -> String
 showResult showing = either (showError showing) (printf "%f")
 
-showError :: ErrorShowing -> Error -> String
-showError Long (SyntaxError pos expected)
+showError :: ErrorShowing -> SmallCalcError -> String
+showError Long (ESyntax pos expected)
     =  "!"
     ++ showGraphicErrorPos pos
     ++ showLst "Expected" expected
-showError _ (SyntaxError pos _)
+showError _ (ESyntax pos _)
     =  "Syntax error at position " ++ show pos
-showError _ DivisionByZero
+showError _ EDivisionByZero
     =  "Division by zero"
 
 showGraphicErrorPos :: Int -> String
