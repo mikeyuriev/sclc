@@ -6,7 +6,6 @@ import Data.List (intercalate)
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 import Text.Printf (printf)
-import qualified Text.Parsec as P
 import SmallCalc.Eval
 import SmallCalc.Parser
 import SmallCalc.Error
@@ -18,9 +17,8 @@ main = do
 
 handleArg :: String -> IO ()
 handleArg arg = do
-    let result = evalLine "Command line" arg
     putStrLn $ " " ++ arg ++ " = "
-    putStr $ showResult result
+    putStr $ parseAndShow arg
 
 loop :: IO ()
 loop = do
@@ -28,11 +26,11 @@ loop = do
     hFlush stdout
     input <- getLine
     unless (null input) $ do
-        putStr $ showResult $ evalLine "User input" input
+        putStr $ parseAndShow input
         loop
 
-evalLine :: P.SourceName -> String -> Either Error Double
-evalLine source s = evalParseResult $ P.parse line source s
+parseAndShow :: String -> String
+parseAndShow = showResult . evalParseResult . parseLine
 
 showResult :: EvalResult -> String
 showResult = either showError (printf "%f\n")

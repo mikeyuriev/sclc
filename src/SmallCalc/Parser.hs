@@ -1,26 +1,33 @@
 module SmallCalc.Parser
-    ( line
-    , expr
+    ( ParseResult
+    , parseLine
     )
 where
 
-import Data.Functor
+import Control.Arrow (left)
+import Data.Functor (($>))
 import Text.Parsec
 import Text.Parsec.String
 import SmallCalc.AST
+import SmallCalc.Error
+
+type ParseResult = Either Error Node
+
+parseLine :: String -> ParseResult
+parseLine s = left fromParseError $ parse line "" s
 
 line :: Parser Node
 line = expr <* (eof <?> "end of input")
 
 expr :: Parser Node
-expr =  many (space <?> "") *> term `chainl1` lexeme addOp
+expr = many (space <?> "") *> term `chainl1` lexeme addOp
 
 term :: Parser Node
 term = factor `chainl1` lexeme mulOp
 
 factor :: Parser Node
-factor =
-        (lexeme unaryOp <*> factor)
+factor
+    =   (lexeme unaryOp <*> factor)
     <|> lexeme parens
     <|> lexeme constant
 
@@ -50,16 +57,15 @@ constant = Constant <$> fmap read num
         dot = char '.' <?> "."
 
 addOp :: Parser (Node -> Node -> Node)
-addOp =
-        (char '+' $> BinaryOp Add <?> "+")
+addOp
+    =   (char '+' $> BinaryOp Add <?> "+")
     <|> (char '-' $> BinaryOp Sub <?> "-")
 
 mulOp :: Parser (Node -> Node -> Node)
-mulOp =
-        (char '*' $> BinaryOp Mul <?> "*")
+mulOp
+    =   (char '*' $> BinaryOp Mul <?> "*")
     <|> (char '/' $> BinaryOp Div <?> "/")
     <|> (char '%' $> BinaryOp Mod <?> "%")
 
 unaryOp :: Parser (Node -> Node)
-unaryOp =
-    (char '-' <?> "-") $> UnaryOp Negate
+unaryOp = (char '-' <?> "-") $> UnaryOp Negate

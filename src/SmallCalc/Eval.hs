@@ -9,6 +9,7 @@ import Control.Arrow (left)
 import Data.Fixed (mod')
 import Text.Parsec.Error (ParseError)
 import SmallCalc.AST
+import SmallCalc.Parser
 import SmallCalc.Error
 
 type EvalResult = Either Error Double
@@ -25,8 +26,8 @@ binaryOp Mod x y = fmap mod' x <*> y
 unaryOp :: UnaryOp -> EvalResult -> EvalResult
 unaryOp Negate = fmap (* (-1.0))
 
-evalParseResult :: Either ParseError Node -> EvalResult
-evalParseResult node = eval =<< left fromParseError node
+evalParseResult :: ParseResult -> EvalResult
+evalParseResult node = eval =<< node
 
 eval :: Node -> EvalResult
 eval (Constant c)        = pure c
