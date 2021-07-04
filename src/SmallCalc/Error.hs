@@ -16,11 +16,11 @@ fromParseError err
     = SyntaxError (sourceColumn $ errorPos err) (expectedTokens err)
 
 expectedTokens :: ParseError -> [String]
-expectedTokens err
+expectedTokens
     = filter (not . null)
-    $ map messageString
-    $ filter isExpected
-    $ errorMessages err
+    . map messageString
+    . filter isExpected
+    . errorMessages
     where
         isExpected :: Message -> Bool
         isExpected (Expect _) = True

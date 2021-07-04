@@ -25,7 +25,7 @@ unaryOp :: UnaryOp -> EvalResult -> EvalResult
 unaryOp Negate = fmap (* (-1.0))
 
 evalParseResult :: ParseResult -> EvalResult
-evalParseResult node = eval =<< node
+evalParseResult = (=<<) eval
 
 eval :: Node -> EvalResult
 eval (Constant c)        = pure c
