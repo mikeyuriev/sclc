@@ -5,9 +5,7 @@ module SmallCalc.Eval
     )
 where
 
-import Control.Arrow (left)
 import Data.Fixed (mod')
-import Text.Parsec.Error (ParseError)
 import SmallCalc.AST
 import SmallCalc.Parser
 import SmallCalc.Error

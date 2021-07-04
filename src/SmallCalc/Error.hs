@@ -3,26 +3,26 @@ module SmallCalc.Error
     , fromParseError
     ) where
 
-import qualified Text.Parsec.Error as E
-import qualified Text.Parsec.Pos as P
+import Text.Parsec.Error
+import Text.Parsec.Pos
 
 data Error
     = SyntaxError Int [String]
     | DivisionByZero
     deriving (Eq, Show)
 
-fromParseError :: E.ParseError -> Error
+fromParseError :: ParseError -> Error
 fromParseError err
-    = SyntaxError (P.sourceColumn $ E.errorPos err) (expectedTokens err)
+    = SyntaxError (sourceColumn $ errorPos err) (expectedTokens err)
 
-expectedTokens :: E.ParseError -> [String]
+expectedTokens :: ParseError -> [String]
 expectedTokens err
     = filter (not . null)
-    $ map E.messageString
+    $ map messageString
     $ filter isExpected
-    $ E.errorMessages err
+    $ errorMessages err
     where
-        isExpected :: E.Message -> Bool
-        isExpected (E.Expect _) = True
+        isExpected :: Message -> Bool
+        isExpected (Expect _) = True
         isExpected _            = False
 
