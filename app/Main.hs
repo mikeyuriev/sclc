@@ -1,14 +1,12 @@
 module Main where
 
-import Control.Monad.State (unless, when)
+import Control.Monad.State (unless)
 import Data.Bool (bool)
-import Data.Either (isLeft)
 import Data.List (intercalate)
 import System.Environment (getArgs)
 import System.IO (hFlush, stdout)
 import Text.Printf (printf)
 import qualified Text.Parsec as P
-import qualified Text.Parsec.Pos as PP
 import SmallCalc.Eval
 import SmallCalc.Parser
 import SmallCalc.Error
@@ -21,7 +19,7 @@ main = do
 handleArg :: String -> IO ()
 handleArg arg = do
     let result = evalLine "Command line" arg
-    when (isLeft result) $ do putStrLn $ " " ++ arg
+    putStrLn $ " " ++ arg ++ " = "
     putStr $ showResult result
 
 loop :: IO ()
@@ -33,17 +31,20 @@ loop = do
         putStr $ showResult $ evalLine "User input" input
         loop
 
-showResult :: Either P.ParseError Double -> String
-showResult (Right value) = printf "%f\n" value
-showResult (Left err)    =
-    "E" ++ showGraphicErrorPos (errorPos err) ++ "\n"
-    ++ showLst "Expected" (expectedTokens err)
+evalLine :: P.SourceName -> String -> Either Error Double
+evalLine source s = evalParseResult $ P.parse line source s
 
-evalLine :: P.SourceName -> String -> Either P.ParseError Double
-evalLine source s = eval <$> P.parse line source s
+showResult :: EvalResult -> String
+showResult = either showError (printf "%f\n")
 
-errorPos :: P.ParseError -> Int
-errorPos = PP.sourceColumn . P.errorPos
+showError :: Error -> String
+showError (SyntaxError pos expected)
+    =  "!"
+    ++ showGraphicErrorPos pos
+    ++ showLst "Expected" expected
+    ++ "\n"
+showError DivisionByZero
+    =  "Division by zero\n"
 
 showGraphicErrorPos :: Int -> String
 showGraphicErrorPos 0 = ""
@@ -51,8 +52,5 @@ showGraphicErrorPos 1 = "^"
 showGraphicErrorPos x = '-' : showGraphicErrorPos (x - 1)
 
 showLst :: String -> [String] -> String
-showLst _ []         = ""
-showLst header items =
-    header
-    ++ " "
-    ++ intercalate ", " (filter (not . null) items) ++ "\n"
+showLst _ []         =  ""
+showLst header items = "\n" ++ header ++ " " ++ intercalate ", " items

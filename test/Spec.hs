@@ -6,6 +6,7 @@ import qualified Text.Parsec as P
 import SmallCalc.AST
 import SmallCalc.Parser
 import SmallCalc.Eval
+import SmallCalc.Error
 
 parseExpr :: String -> Either P.ParseError Node
 parseExpr = P.parse expr ""
@@ -152,18 +153,30 @@ evalSpec :: Spec
 evalSpec = do
     describe "eval" $ do
         it "should evaluate node" $ do
-            printf "%.2f" (
-                eval
-                    ( BinaryOp Mod
-                        ( BinaryOp Mul
-                            ( BinaryOp Add
-                                ( Constant 2.1 )
-                                ( Constant 3.2)
-                            )
-                            ( UnaryOp Negate
-                                ( Constant 4.3 )
-                            )
+            printf "%.2f" <$> eval
+                ( BinaryOp Mod
+                    ( BinaryOp Mul
+                        ( BinaryOp Add
+                            ( Constant 2.1 )
+                            ( Constant 3.2)
                         )
-                        ( Constant 5.4 )
+                        ( UnaryOp Negate
+                            ( Constant 4.3 )
+                        )
                     )
-                ) `shouldBe` "4.21"
+                    ( Constant 5.4 )
+                ) `shouldBe` Right "4.21"
+        it "should return error on division by zero" $ do
+            eval
+                ( BinaryOp Div
+                    ( Constant 1.0 )
+                    ( BinaryOp Sub
+                        ( Constant 2.0 )
+                        ( Constant 2.0 )
+                    )
+                ) `shouldBe` Left DivisionByZero
+            eval
+                ( BinaryOp Mod
+                    ( Constant 0.0 )
+                    ( Constant 0.0 )
+                ) `shouldBe` Left DivisionByZero

@@ -1,23 +1,34 @@
 module SmallCalc.Eval
-    ( eval
+    ( EvalResult
+    , evalParseResult
+    , eval
     )
 where
 
-import Data.Fixed
+import Control.Arrow (left)
+import Data.Fixed (mod')
+import Text.Parsec.Error (ParseError)
 import SmallCalc.AST
+import SmallCalc.Error
 
-binaryOp :: BinaryOp -> (Double -> Double -> Double)
-binaryOp Add = (+)
-binaryOp Sub = (-)
-binaryOp Mul = (*)
-binaryOp Div = (/)
-binaryOp Mod = mod'
+type EvalResult = Either Error Double
 
-unaryOp :: UnaryOp -> (Double -> Double)
-unaryOp Negate = (* (-1.0))
+binaryOp :: BinaryOp -> EvalResult -> EvalResult -> EvalResult
+binaryOp Div _ (Right 0) = Left DivisionByZero
+binaryOp Mod _ (Right 0) = Left DivisionByZero
+binaryOp Add x y = fmap (+) x <*> y
+binaryOp Sub x y = fmap (-) x <*> y
+binaryOp Mul x y = fmap (*) x <*> y
+binaryOp Div x y = fmap (/) x <*> y
+binaryOp Mod x y = fmap mod' x <*> y
 
-eval :: Node -> Double
-eval (Constant c)        = c
-eval (UnaryOp op v)      = unaryOp op (eval v)
-eval (BinaryOp op lv rv) = binaryOp op (eval lv) (eval rv)
+unaryOp :: UnaryOp -> EvalResult -> EvalResult
+unaryOp Negate = fmap (* (-1.0))
 
+evalParseResult :: Either ParseError Node -> EvalResult
+evalParseResult node = eval =<< left fromParseError node
+
+eval :: Node -> EvalResult
+eval (Constant c)        = pure c
+eval (UnaryOp op n)      = unaryOp op (eval n)
+eval (BinaryOp op ln rn) = binaryOp op (eval ln) (eval rn)
