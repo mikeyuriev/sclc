@@ -10,15 +10,18 @@ import SmallCalc.Eval
 import SmallCalc.Parser
 import SmallCalc.Error
 
+data ErrorShowing
+    = Short
+    | Long
+    deriving Eq
+
 main :: IO ()
 main = do
     args <- getArgs
-    bool (handleArg $ head args) loop (null args)
+    bool (handleArgs args) loop (null args)
 
-handleArg :: String -> IO ()
-handleArg arg = do
-    putStrLn $ " " ++ arg ++ " = "
-    putStr $ parseAndShow arg
+handleArgs :: [String] -> IO ()
+handleArgs = putStrLn . intercalate "\n" . map (parseAndShow Short)
 
 loop :: IO ()
 loop = do
@@ -26,23 +29,24 @@ loop = do
     hFlush stdout
     input <- getLine
     unless (null input) $ do
-        putStr $ parseAndShow input
+        putStrLn . parseAndShow Long $ input
         loop
 
-parseAndShow :: String -> String
-parseAndShow = showResult . evalParseResult . parseLine
+parseAndShow :: ErrorShowing -> String -> String
+parseAndShow showing = showResult showing . evalParseResult . parseLine
 
-showResult :: EvalResult -> String
-showResult = either showError (printf "%f\n")
+showResult :: ErrorShowing -> EvalResult -> String
+showResult showing = either (showError showing) (printf "%f")
 
-showError :: Error -> String
-showError (SyntaxError pos expected)
+showError :: ErrorShowing -> Error -> String
+showError Long (SyntaxError pos expected)
     =  "!"
     ++ showGraphicErrorPos pos
     ++ showLst "Expected" expected
-    ++ "\n"
-showError DivisionByZero
-    =  "Division by zero\n"
+showError _ (SyntaxError pos _)
+    =  "Syntax error at position " ++ show pos
+showError _ DivisionByZero
+    =  "Division by zero"
 
 showGraphicErrorPos :: Int -> String
 showGraphicErrorPos 0 = ""
