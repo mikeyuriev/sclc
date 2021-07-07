@@ -1,4 +1,7 @@
-module SmallCalc.Context where
+module SmallCalc.Context
+    ( getSymbol
+    , putSymbol
+    ) where
 
 import SmallCalc.Types
 
