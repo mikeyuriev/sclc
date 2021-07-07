@@ -38,9 +38,8 @@ library
       src
   build-depends:
       base >=4.7 && <5
-    , hspec >=2.7 && <3
-    , mtl >=2.2 && <3
-    , parsec >=3.1 && <4
+    , mtl
+    , parsec
   default-language: Haskell2010
 
 executable sclc
@@ -52,9 +51,8 @@ executable sclc
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , hspec >=2.7 && <3
-    , mtl >=2.2 && <3
-    , parsec >=3.1 && <4
+    , mtl
+    , parsec
     , sclc
   default-language: Haskell2010
 
@@ -62,14 +60,17 @@ test-suite sclc-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      ContextSpec
+      EvalSpec
+      ParserSpec
       Paths_sclc
   hs-source-dirs:
       test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
-    , hspec >=2.7 && <3
-    , mtl >=2.2 && <3
-    , parsec >=3.1 && <4
+    , hspec
+    , mtl
+    , parsec
     , sclc
   default-language: Haskell2010

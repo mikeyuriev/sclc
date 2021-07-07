@@ -1,2 +1,13 @@
 cradle:
   stack:
+    - path: "./src"
+      component: "sclc:lib"
+
+    - path: "./app/Main.hs"
+      component: "sclc:exe:sclc"
+
+    - path: "./app/Paths_sclc.hs"
+      component: "sclc:exe:sclc"
+
+    - path: "./test"
+      component: "sclc:test:sclc-test"
