@@ -28,7 +28,7 @@ library:
   source-dirs: src
 
 executables:
-  sclc-exe:
+  sclc:
     main:                Main.hs
     source-dirs:         app
     ghc-options:

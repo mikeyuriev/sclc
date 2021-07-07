@@ -1,17 +1,10 @@
-module SmallCalc.Error
-    ( SmallCalcError (..)
-    , fromParseError
-    ) where
+module SmallCalc.Error.Internal where
 
 import Text.Parsec.Error
 import Text.Parsec.Pos
+import SmallCalc.Types
 
-data SmallCalcError
-    = ESyntax Int [String]
-    | EDivisionByZero
-    deriving (Eq, Show)
-
-fromParseError :: ParseError -> SmallCalcError
+fromParseError :: ParseError -> Error
 fromParseError err
     = ESyntax (sourceColumn $ errorPos err) (expectedTokens err)
 
@@ -24,5 +17,5 @@ expectedTokens
     where
         isExpected :: Message -> Bool
         isExpected (Expect _) = True
-        isExpected _            = False
+        isExpected _          = False
 
