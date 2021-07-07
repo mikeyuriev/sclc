@@ -1,1 +1,4 @@
-# Simple console AST-based calculator
+# Sclc
+
+Simple console AST-based calculator.
+Writen for practice in Haskell.
